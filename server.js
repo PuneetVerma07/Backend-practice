@@ -1,17 +1,21 @@
-const express = require("express");
+const express = require("express")
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json())
 
-app.get("/", (req, res) => {
-  res.send("Welcome to Home Page...");
-});
+let notes = []
 
-app.get("/about", (req, res) => {
-  res.send("Welcome to About Page...");
-});
+app.post("/notes", (req, res) => {
+    console.log(req.body)
+    notes.push(req.body)
+
+    res.json({
+        message: "notes added successfully",
+        notes: notes
+    })
+})
 
 app.listen(3000, () => {
-  console.log("Server is running on port 3000.");
-});
+    console.log("Server is running on port 3000")
+})
