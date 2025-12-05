@@ -1,43 +1,64 @@
+require("dotenv").config();
+
 const express = require("express");
+const connectToDB = require("./src/db/db");
+const noteModel = require("./src/models/note.model");
 
 const app = express();
 
 app.use(express.json());
+connectToDB();
 
-let notes = [];
+app.post("/notes", async (req, res) => {
+  const { title, content } = req.body;
 
-app.post("/notes", (req, res) => {
-  console.log(req.body);
-  notes.push(req.body);
+  await noteModel.create({
+    title,
+    content,
+  });
 
   res.json({
-    message: "note created successfullyf",
+    message: "note created successfully",
   });
 });
 
-app.get("/notes", (req, res) => {
-  res.json(notes);
-});
-
-app.delete("/notes/:index", (req, res) => {
-  const index = req.params.index;
-
-  delete notes[index];
+app.get("/notes", async (req, res) => {
+  const notes = await noteModel.find();
 
   res.json({
-    message: "note deleted",
+    message: "notes fetched successfully",
+    notes,
   });
 });
 
-app.patch("/notes/:index", (req, res) => {
-  const index = req.params.index;
+app.delete("/notes/:id", async (req, res) => {
+  const noteId = req.params.id;
+
+  await noteModel.findOneAndDelete({
+    _id: noteId,
+  });
+
+  res.json({
+    message: "note deleted successfully",
+  });
+});
+
+app.patch("/notes/:id", async (req, res) => {
+  const noteId = req.params.id;
   const { title } = req.body;
 
-  notes[index].title = title;
-
-  res.json({
-    message: "note updated successfully.",
-  });
+  await noteModel.findOneAndUpdate(
+    {
+      _id: noteId,
+    },
+    {
+      title: title,
+    }
+    );
+    
+    res.json({
+        message: 'note updated successfully.'
+    })
 });
 
 app.listen(3000, () => {
