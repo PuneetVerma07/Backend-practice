@@ -7,33 +7,31 @@ const router = express.Router();
 router.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
-    const isExistUser = await userModel.findOne({
-        username,
+    const isUserExists = await userModel.findOne({
+        username
     })
 
-    if (isExistUser) {
-        return res.status(401).json({
-            message: "user already exist"
+    if (isUserExists) {
+        return res.status(409).json({
+            message: "username already used"
         })
     }
 
-    const user = await userModel.create({
-        username: username,
-        password: password
-    })
-
+    const user = await userModel.create({username, password})
     const token = jwt.sign({id: user._id}, process.env.JWT_SECRET)
 
-    res.cookie("token", token)
+    res.cookie("token", token, {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    })
 
     res.status(201).json({
-        message: "user created successfully",
+        message: "user created successfully", 
         user
     })
 })
 
 router.get("/user", async (req, res) => {
-    const token = req.cookies.token;
+    const { token } = req.cookies;
 
     if (!token) {
         return res.status(401).json({
@@ -45,16 +43,16 @@ router.get("/user", async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         const user = await userModel.findOne({
-            _id : decoded.id
+            _id: decoded.id
         })
 
         res.status(200).json({
-            message: "user fetched successfully", 
+            message: "user fetched successfully",
             user
         })
 
-    } catch (err) {
-        res.status(401).json({
+    } catch (error) {
+        return res.status(401).json({
             message: "unauthorized invalid token"
         })
     }
@@ -63,13 +61,11 @@ router.get("/user", async (req, res) => {
 router.post("/login", async (req, res) => {
     const { username, password } = req.body;
 
-    const user = await userModel.findOne({
-        username
-    })
+    const user = await userModel.findOne({username})
 
     if (!user) {
         return res.status(401).json({
-            message: "unauthorized"
+            message: "user cannot found"
         })
     }
 
@@ -77,22 +73,20 @@ router.post("/login", async (req, res) => {
 
     if (!isValidPassword) {
         return res.status(401).json({
-            message: "Invalid password"
+            message: "invalid password"
         })
     }
 
     const token = jwt.sign({id: user._id}, process.env.JWT_SECRET)
 
     res.cookie("token", token, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60* 1000)
     })
 
-    res.status(200).json({
-        message: "user loggedIn successfully", 
+    res.status(201).json({
+        message: "user loggedIn successfully",
         user
     })
-
-
 })
 
 router.get("/logout", async (req, res) => {
@@ -102,6 +96,7 @@ router.get("/logout", async (req, res) => {
         message: "user loggedout successfully"
     })
 })
+
 
 
 module.exports = router;
