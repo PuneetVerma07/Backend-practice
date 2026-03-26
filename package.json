@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/PuneetVerma07/Backend-practice#readme",
   "dependencies": {
+    "@google/genai": "^1.46.0",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "socket.io": "^4.8.3"
   }

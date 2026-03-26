@@ -2,8 +2,8 @@ const express = require("express")
 
 const app = express();
 
-app.use("/", (req, res) => {
-    res.send("hellow world!")
+app.get("/", (req, res) => {
+    res.send("howllw world!")
 })
 
 module.exports = app;
