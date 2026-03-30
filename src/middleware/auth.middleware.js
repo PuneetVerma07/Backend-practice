@@ -5,7 +5,7 @@ async function authUser(req, res, next) {
     const { token } = req.cookies;
 
     if (!token) {
-        return res.status(400).json({ "message": "Unauthorized Please logIn first" })
+        return res.status(400).json({ "message": "unauthorized" })
     }
 
     try {
@@ -15,9 +15,9 @@ async function authUser(req, res, next) {
 
         req.user = user;
 
-        next();
+        next()
     } catch (error) {
-        res.status(401).json({ "message": "Unauthorized" })
+        console.error("Error while user authorization")
     }
 }
 
