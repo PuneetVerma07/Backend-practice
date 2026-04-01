@@ -7,12 +7,13 @@ const chatRoutes = require("./routes/chat.routes")
 
 const app = express();
 
-/* Using middleware */
+/* Using Middleware */
 app.use(express.json())
 app.use(cookieParser())
 
-/* Using Routes */
+/* Using routes */
 app.use("/api/auth", authRoutes)
 app.use("/api/chat", chatRoutes)
+
 
 module.exports = app;

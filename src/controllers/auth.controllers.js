@@ -2,26 +2,24 @@ const userModel = require("../models/user.model")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
-
 async function registerUser(req, res) {
-
     const { fullName: { firstName, lastName }, email, password } = req.body;
-
-    const isUserAlreadyExists = await userModel.findOne({ email })
+        
+    const isUserAlreadyExists = await userModel.findOne({email})
 
     if (isUserAlreadyExists) {
-        return res.status(400).json({ "message": "User already exists" })
+        return res.status(400).json({"message":"user already exists"})
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
 
     const user = await userModel.create({
-        fullName: {firstName, lastName},
+        fullName: { firstName, lastName },
         email,
-        password: hashedPassword,
+        password: hashedPassword
     })
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
+    const token = jwt.sign({id: user._id}, process.env.JWT_SECRET)
 
     res.cookie("token", token)
 
@@ -30,25 +28,24 @@ async function registerUser(req, res) {
         user: {
             id: user._id,
             email: user.email,
-            user: user.fullName
+            fullname: user.fullName
         }
     })
 }
 
 async function loginUser(req, res) {
-
     const { email, password } = req.body;
 
     const user = await userModel.findOne({email})
 
     if (!user) {
-        return res.status(400).json({"message":"Unauthorized"})
+        return res.status(400).json({"message":"user not found"})
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password)
 
     if (!isValidPassword) {
-        return res.status(400).json({"message":"Unauthorized Invalid email or password"})
+        return res.status(400).json({"message":"Unauthorized: Invalid email or password "})
     }
 
     const token = jwt.sign({id: user._id}, process.env.JWT_SECRET)
@@ -56,14 +53,13 @@ async function loginUser(req, res) {
     res.cookie("token", token)
 
     res.status(200).json({
-        "message": "user loggedIn successfully", 
+        message: "user loggedIn successfully", 
         user: {
-            id: user._id,
+            _id: user._id,
             email: user.email,
             fullName: user.fullName
         }
     })
-    
 }
 
-module.exports = { registerUser, loginUser }
+module.exports = {registerUser, loginUser}

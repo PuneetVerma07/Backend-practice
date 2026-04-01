@@ -5,7 +5,7 @@ async function authUser(req, res, next) {
     const { token } = req.cookies;
 
     if (!token) {
-        return res.status(400).json({ "message": "unauthorized" })
+        return res.status(400).json({ "message": "Unauthorized : token not found" })
     }
 
     try {
@@ -15,10 +15,13 @@ async function authUser(req, res, next) {
 
         req.user = user;
 
-        next()
+        next();
     } catch (error) {
-        console.error("Error while user authorization")
+        console.log("Error while user authorization")
     }
+
+
+
 }
 
-module.exports = { authUser }
+module.exports = { authUser };
